@@ -9788,38 +9788,66 @@ TEST_F(FormatTest, FormatsBlocksWithZeroColumnWidth) {
   ZeroColumn.ColumnLimit = 0;
   ZeroColumn.AllowShortBlocksOnASingleLine = false;
 
-  verifyFormat("[[SessionService sharedService] loadWindowWithCompletionBlock:^(SessionWindow *window) {\n"
-               "  if (window) {\n"
-               "    [self windowDidLoad:window];\n"
-               "  } else {\n"
-               "    [self errorLoadingWindow];\n"
-               "  }\n"
-               "}];",
-               ZeroColumn);
-  verifyFormat("[[SessionService sharedService] loadWindowWithCompletionBlock:^(SessionWindow *window) {\n"
-               "  if (window) {\n"
-               "    [self windowDidLoad:window];\n"
-               "  } else {\n"
-               "    [self errorLoadingWindow];\n"
-               "  }\n"
-               "} secondBlock:^(NSString *string) {\n"
-               "  NSLog(string);\n"
-               "}];",
-               ZeroColumn);
-
-  verifyFormat("f(^{\n"
-               "  @autoreleasepool {\n"
-               "    if (a) {\n"
-               "      g();\n"
-               "    }\n"
-               "  }\n"
-               "});",
-               ZeroColumn);
-  verifyFormat("void (^largeBlock)(void) = ^{\n"
-               "  // ...\n"
-               "};\n",
-               ZeroColumn);
-
+  EXPECT_EQ("[[SessionService sharedService] "
+            "loadWindowWithCompletionBlock:^(SessionWindow *window) {\n"
+            "  if (window) {\n"
+            "    [self windowDidLoad:window];\n"
+            "  } else {\n"
+            "    [self errorLoadingWindow];\n"
+            "  }\n"
+            "}];",
+            format("[[SessionService sharedService] "
+                   "loadWindowWithCompletionBlock:^(SessionWindow *window) {\n"
+                   "                if (window) {\n"
+                   "    [self windowDidLoad:window];\n"
+                   "  } else {\n"
+                   "    [self errorLoadingWindow];\n"
+                   "  }\n"
+                   "}];",
+                   ZeroColumn));
+  EXPECT_EQ("[[SessionService sharedService] "
+            "loadWindowWithCompletionBlock:^(SessionWindow *window) {\n"
+            "  if (window) {\n"
+            "    [self windowDidLoad:window];\n"
+            "  } else {\n"
+            "    [self errorLoadingWindow];\n"
+            "  }\n"
+            "} secondBlock:^(NSString *string) {\n"
+            "  NSLog(string);\n"
+            "}];",
+            format("[[SessionService sharedService] "
+                   "loadWindowWithCompletionBlock:^(SessionWindow *window) {\n"
+                   "               if (window) {\n"
+                   "    [self windowDidLoad:window];\n"
+                   "  } else {\n"
+                   "    [self errorLoadingWindow];\n"
+                   "  }\n"
+                   "} secondBlock:^(NSString *string) {\n"
+                   "      NSLog(string);\n"
+                   "}];",
+                   ZeroColumn));
+  EXPECT_EQ("f(^{\n"
+            "  @autoreleasepool {\n"
+            "    if (a) {\n"
+            "      g();\n"
+            "    }\n"
+            "  }\n"
+            "});",
+            format("f(^{\n"
+                   "             @autoreleasepool {\n"
+                   "    if (a) {\n"
+                   "      g();\n"
+                   "    }\n"
+                   "  }\n"
+                   "});",
+                   ZeroColumn));
+  EXPECT_EQ("void (^largeBlock)(void) = ^{\n"
+            "  // ...\n"
+            "};\n",
+            format("void (^largeBlock)(void) = ^{\n"
+                   "                 // ...\n"
+                   "};\n",
+                   ZeroColumn));
 }
 
 TEST_F(FormatTest, SupportsCRLF) {
