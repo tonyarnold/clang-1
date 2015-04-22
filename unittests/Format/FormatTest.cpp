@@ -9714,6 +9714,13 @@ TEST_F(FormatTest, FormatsBlocks) {
                "                        return 1;\n"
                "                      }\n"
                "                      bbb:f(a * bbbbbbbb)];");
+  verifyFormat("[myObject doSomethingWith:arg1\n"
+               "                      aaa:^int(int *a) {\n"
+               "                        return 1;\n"
+               "                      }\n"
+               "                      bbb:^int(int *a) {\n"
+               "                        return 1;\n"
+               "                      }\n");
 
   verifyFormat("[operation setCompletionBlock:^{\n"
                "  [self.delegate newDataAvailable];\n"
