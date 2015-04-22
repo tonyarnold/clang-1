@@ -20,7 +20,8 @@ namespace clang {
 namespace format {
 namespace test {
 
-inline std::string messUp(llvm::StringRef Code) {
+inline std::string messUp(llvm::StringRef Code,
+                          const bool MessUpNewLines = true) {
   std::string MessedUp(Code.str());
   bool InComment = false;
   bool InPreprocessorDirective = false;
@@ -34,7 +35,7 @@ inline std::string messUp(llvm::StringRef Code) {
       if (i != 0)
         MessedUp[i - 1] = '\n';
       InPreprocessorDirective = true;
-    } else if (MessedUp[i] == '\\' && MessedUp[i + 1] == '\n') {
+    } else if (MessedUp[i] == '\\' && MessedUp[i + 1] == '\n' && MessUpNewLines) {
       MessedUp[i] = ' ';
       MessedUp[i + 1] = ' ';
     } else if (MessedUp[i] == '\n') {
@@ -42,7 +43,7 @@ inline std::string messUp(llvm::StringRef Code) {
         InComment = false;
       } else if (InPreprocessorDirective) {
         InPreprocessorDirective = false;
-      } else {
+      } else if (MessUpNewLines) {
         JustReplacedNewline = true;
         MessedUp[i] = ' ';
       }
