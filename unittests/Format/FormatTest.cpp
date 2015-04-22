@@ -9783,6 +9783,37 @@ TEST_F(FormatTest, FormatsBlocks) {
                FourIndent);
 }
 
+TEST_F(FormatTest, FormatsXcodeStyleBlocks) {
+  FormatStyle XcodeStyle = getLLVMStyle();
+  XcodeStyle.ObjCCompressMoreThanTwoBlocks = false;
+  verifyFormat("[[SessionService sharedService]\n"
+               "    loadWindowWithCompletionBlock:^(SessionWindow *window) {\n"
+               "      if (window) {\n"
+               "        [self windowDidLoad:window];\n"
+               "      } else {\n"
+               "        [self errorLoadingWindow];\n"
+               "      }\n"
+               "    }];",
+               XcodeStyle);
+
+  verifyFormat("[myObject doSomethingWith:arg1\n"
+               "               firstBlock:^(Foo *a) {\n"
+               "                 // ...\n"
+               "                 int i;\n"
+               "               }\n"
+               "              secondBlock:^(Bar *b) {\n"
+               "                // ...\n"
+               "                int i;\n"
+               "              }\n"
+               "               thirdBlock:^Foo(Bar *b) {\n"
+               "                 // ...\n"
+               "                 int i;\n"
+               "               }];",
+               XcodeStyle);
+
+}
+
+
 TEST_F(FormatTest, SupportsCRLF) {
   EXPECT_EQ("int a;\r\n"
             "int b;\r\n"

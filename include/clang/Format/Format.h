@@ -222,6 +222,9 @@ struct FormatStyle {
   /// on a single line.
   ShortFunctionStyle AllowShortFunctionsOnASingleLine;
 
+  /// \brief Compress the selector parts when more than two inline blocks are specified
+  bool ObjCCompressMoreThanTwoBlocks;
+
   /// \brief Add a space after \c @property in Objective-C, i.e. use
   /// <tt>\@property (readonly)</tt> instead of <tt>\@property(readonly)</tt>.
   bool ObjCSpaceAfterProperty;

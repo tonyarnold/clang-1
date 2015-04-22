@@ -416,6 +416,7 @@ unsigned ContinuationIndenter::addTokenOnNewLine(LineState &State,
   } else if (NextNonComment->is(TT_SelectorName)) {
     if (!State.Stack.back().ObjCSelectorNameFound) {
       if (NextNonComment->LongestObjCSelectorName == 0) {
+        // This catches keys in Literal NSDictionaries
         State.Stack.back().AlignColons = false;
       } else {
         State.Stack.back().ColonPos =
@@ -436,6 +437,10 @@ unsigned ContinuationIndenter::addTokenOnNewLine(LineState &State,
     //                        }];
     // Thus, we set LastSpace of the next higher NestingLevel, to which we move
     // when we consume all of the "}"'s FakeRParens at the "{".
+    //
+    // NOTE: The unit tests pass with this commented out
+    //   Can we remove this?
+
     if (State.Stack.size() > 1)
       State.Stack[State.Stack.size() - 2].LastSpace =
           std::max(State.Stack.back().LastSpace, State.Stack.back().Indent) +

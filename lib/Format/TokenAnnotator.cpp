@@ -290,7 +290,8 @@ private:
         if (Contexts.back().FirstObjCSelectorName) {
           Contexts.back().FirstObjCSelectorName->LongestObjCSelectorName =
               Contexts.back().LongestObjCSelectorName;
-          if (Left->BlockParameterCount > 1)
+          // Compress blocks if there are multiple block arguments
+          if (Left->BlockParameterCount > 1 && Style.ObjCCompressMoreThanTwoBlocks)
             Contexts.back().FirstObjCSelectorName->LongestObjCSelectorName = 0;
         }
         next();
