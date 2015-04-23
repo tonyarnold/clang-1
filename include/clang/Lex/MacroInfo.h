@@ -17,11 +17,13 @@
 
 #include "clang/Lex/Token.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Allocator.h"
 #include <cassert>
 
 namespace clang {
+class Module;
 class Preprocessor;
 
 /// \brief Encapsulates the data about a macro definition (e.g. its tokens).
@@ -576,6 +578,76 @@ MacroDirective::DefInfo::getPreviousDefinition() {
     return DefInfo();
   return DefDirective->getPrevious()->getDefinition();
 }
+
+/// \brief Represents a macro directive exported by a module.
+///
+/// There's an instance of this class for every macro #define or #undef that is
+/// the final directive for a macro name within a module. These entities also
+/// represent the macro override graph.
+///
+/// These are stored in a FoldingSet in the preprocessor.
+class ModuleMacro : public llvm::FoldingSetNode {
+  /// The name defined by the macro.
+  IdentifierInfo *II;
+  /// The body of the #define, or nullptr if this is a #undef.
+  MacroInfo *Macro;
+  /// The module that exports this macro.
+  Module *OwningModule;
+  /// The number of module macros that override this one.
+  unsigned NumOverriddenBy;
+  /// The number of modules whose macros are directly overridden by this one.
+  unsigned NumOverrides;
+  //ModuleMacro *OverriddenMacros[NumOverrides];
+
+  friend class Preprocessor;
+
+  ModuleMacro(Module *OwningModule, IdentifierInfo *II, MacroInfo *Macro,
+              ArrayRef<ModuleMacro *> Overrides)
+      : II(II), Macro(Macro), OwningModule(OwningModule),
+        NumOverriddenBy(0), NumOverrides(Overrides.size()) {
+    std::copy(Overrides.begin(), Overrides.end(),
+              reinterpret_cast<ModuleMacro **>(this + 1));
+  }
+
+public:
+  static ModuleMacro *create(Preprocessor &PP, Module *OwningModule,
+                             IdentifierInfo *II, MacroInfo *Macro,
+                             ArrayRef<ModuleMacro *> Overrides);
+
+  void Profile(llvm::FoldingSetNodeID &ID) const {
+    return Profile(ID, OwningModule, II);
+  }
+  static void Profile(llvm::FoldingSetNodeID &ID, Module *OwningModule,
+                      IdentifierInfo *II) {
+    ID.AddPointer(OwningModule);
+    ID.AddPointer(II);
+  }
+
+  /// Get the ID of the module that exports this macro.
+  Module *getOwningModule() const { return OwningModule; }
+
+  /// Get definition for this exported #define, or nullptr if this
+  /// represents a #undef.
+  MacroInfo *getMacroInfo() const { return Macro; }
+
+  /// Iterators over the overridden module IDs.
+  /// \{
+  typedef ModuleMacro *const *overrides_iterator;
+  overrides_iterator overrides_begin() const {
+    return reinterpret_cast<overrides_iterator>(this + 1);
+  }
+  overrides_iterator overrides_end() const {
+    return overrides_begin() + NumOverrides;
+  }
+  llvm::iterator_range<overrides_iterator> overrides() const {
+    return llvm::make_range(overrides_begin(), overrides_end());
+  }
+  /// \}
+
+  /// Get the number of macros that override this one.
+  unsigned getNumOverridingMacros() const { return NumOverriddenBy; }
+
+};
 
 }  // end namespace clang
 
