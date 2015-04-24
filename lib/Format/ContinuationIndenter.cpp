@@ -858,7 +858,7 @@ void ContinuationIndenter::moveStatePastScopeOpener(LineState &State,
              Tok && Tok != Current.MatchingParen; Tok = Tok->Next) {
           if (Tok->MustBreakBefore || 
               (Tok->CanBreakBefore && Tok->NewlinesBefore > 0)) {
-            BreakBeforeParameter = true;
+            BreakBeforeParameter = Style.ObjCXcodeBlockFormat == false;
             break;
           }
         }
