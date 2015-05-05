@@ -9829,7 +9829,7 @@ TEST_F(FormatTest, FormatsBlocksLeftAligned) {
   DisableLeftAlignedStyle.ObjCBlockIndentWidth = 4;
   DisableLeftAlignedStyle.ObjCLeftAlignMultipleBlocks = false;
 
-  verifyFormat("[myObject doSomethingWith:arg1 // Comment to force colon alignment\n"
+  verifyFormat("[myObject doSomethingWith:arg1 // Comment\n"
                "               firstBlock:^(Foo *a) {\n"
                "                   // ...\n"
                "                   int i;\n"
@@ -9843,7 +9843,7 @@ TEST_F(FormatTest, FormatsBlocksLeftAligned) {
                "                   int i;\n"
                "               }];",
                DisableLeftAlignedStyle);
-  verifyFormat("[UIView animateWithDuration:0 // This will force colon alignment\n"
+  verifyFormat("[UIView animateWithDuration:0\n"
                "                 animations:^{\n"
                "                     view.center = CGPointZero;\n"
                "                 }\n"
