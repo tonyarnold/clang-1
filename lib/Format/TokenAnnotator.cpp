@@ -291,7 +291,8 @@ private:
           Contexts.back().FirstObjCSelectorName->LongestObjCSelectorName =
               Contexts.back().LongestObjCSelectorName;
           // Compress blocks if there are multiple block arguments
-          if (Left->BlockParameterCount > 1 && Style.ObjCXcodeBlockFormat == false)
+          if (Left->BlockParameterCount > 1 &&
+              Style.ObjCLeftAlignMultipleBlocks)
             Contexts.back().FirstObjCSelectorName->LongestObjCSelectorName = 0;
         }
         next();

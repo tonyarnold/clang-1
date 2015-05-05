@@ -9804,7 +9804,8 @@ TEST_F(FormatTest, FormatsXcodeStyleBlocks) {
   AppleStyle.ColumnLimit = 0;
   AppleStyle.IndentWidth = 4;
   AppleStyle.ObjCBlockIndentWidth = 4;
-  AppleStyle.ObjCXcodeBlockFormat = true;
+  AppleStyle.ObjCLeftAlignMultipleBlocks = false;
+  AppleStyle.ObjCAvoidLineBreaksForInlineBlocks = true;
   verifyFormat("[operation setCompletionBlock:^(BOOL complete) {\n"
                "    [self onOperationDone];\n"
                "}];",
