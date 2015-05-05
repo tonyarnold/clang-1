@@ -416,7 +416,6 @@ unsigned ContinuationIndenter::addTokenOnNewLine(LineState &State,
   } else if (NextNonComment->is(TT_SelectorName)) {
     if (!State.Stack.back().ObjCSelectorNameFound) {
       if (NextNonComment->LongestObjCSelectorName == 0) {
-        // This catches keys in Literal NSDictionaries
         State.Stack.back().AlignColons = false;
       } else {
         State.Stack.back().ColonPos =
@@ -854,7 +853,7 @@ void ContinuationIndenter::moveStatePastScopeOpener(LineState &State,
              Tok && Tok != Current.MatchingParen; Tok = Tok->Next) {
           if (Tok->MustBreakBefore || 
               (Tok->CanBreakBefore && Tok->NewlinesBefore > 0)) {
-            BreakBeforeParameter = Style.ObjCXcodeBlockFormat == false;
+            BreakBeforeParameter = !Style.ObjCXcodeBlockFormat;
             break;
           }
         }
