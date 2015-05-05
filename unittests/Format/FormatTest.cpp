@@ -9797,19 +9797,37 @@ TEST_F(FormatTest, FormatsBlocks) {
                "    [self onOperationDone];\n"
                "}];",
                FourIndent);
+
+  FormatStyle AvoidBreaks = getLLVMStyle();
+  AvoidBreaks.ObjCAvoidLineBreaksForInlineBlocks = true;
+  verifyFormat("[UIView animateWithDuration:0 animations:^{ // This does not change behavior\n"
+               "  view.center = CGPointZero;\n"
+               "} completion:^(BOOL finished) {\n"
+               "  NSLog(complete);\n"
+               "}];",
+               AvoidBreaks);
+  verifyFormat("[UIView animateWithDuration:0 animations:^{\n"
+               "  view.center = CGPointZero;\n"
+               "} completion:^(BOOL finished) {\n"
+               "  NSLog(complete);\n"
+               "}];",
+               AvoidBreaks);
+  verifyFormat("[UIView animateWithDuration:0 // Break\n"
+               "    animations:^{\n"
+               "      view.center = CGPointZero;\n"
+               "    }\n"
+               "    completion:^(BOOL finished) {\n"
+               "      NSLog(complete);\n"
+               "    }];",
+               AvoidBreaks);
 }
 
-TEST_F(FormatTest, FormatsXcodeStyleBlocks) {
-  FormatStyle AppleStyle = getLLVMStyle();
-  AppleStyle.ColumnLimit = 0;
-  AppleStyle.IndentWidth = 4;
-  AppleStyle.ObjCBlockIndentWidth = 4;
-  AppleStyle.ObjCLeftAlignMultipleBlocks = false;
-  AppleStyle.ObjCAvoidLineBreaksForInlineBlocks = true;
-  verifyFormat("[operation setCompletionBlock:^(BOOL complete) {\n"
-               "    [self onOperationDone];\n"
-               "}];",
-               AppleStyle);
+TEST_F(FormatTest, FormatsBlocksLeftAligned) {
+  FormatStyle DisableLeftAlignedStyle = getLLVMStyle();
+  DisableLeftAlignedStyle.ColumnLimit = 0;
+  DisableLeftAlignedStyle.IndentWidth = 4;
+  DisableLeftAlignedStyle.ObjCBlockIndentWidth = 4;
+  DisableLeftAlignedStyle.ObjCLeftAlignMultipleBlocks = false;
 
   verifyFormat("[myObject doSomethingWith:arg1 // Comment to force colon alignment\n"
                "               firstBlock:^(Foo *a) {\n"
@@ -9824,41 +9842,7 @@ TEST_F(FormatTest, FormatsXcodeStyleBlocks) {
                "                   // ...\n"
                "                   int i;\n"
                "               }];",
-               AppleStyle);
-  verifyFormat("[myObject doSomethingWith:arg1 firstBlock:^(Foo *a) {\n"
-               "    // ...\n"
-               "    int i;\n"
-               "} secondBlock:^(Bar *b) {\n"
-               "    // ...\n"
-               "    int i;\n"
-               "} thirdBlock:^Foo(Bar *b) {\n"
-               "    // ...\n"
-               "    int i;\n"
-               "}];",
-               AppleStyle);
-
-  verifyFormat("[[SessionService sharedService]"
-               " loadWindowWithCompletionBlock:^(SessionWindow *window) {\n"
-               "    if (window) {\n"
-               "        [self windowDidLoad:window];\n"
-               "    } else {\n"
-               "        [self errorLoadingWindow];\n"
-               "    }\n"
-               "}];",
-               AppleStyle);
-
-  verifyFormat("[UIView animateWithDuration:0 animations:^{ // This does not change behavior\n"
-               "    view.center = CGPointZero;\n"
-               "} completion:^(BOOL finished) {\n"
-               "    NSLog(complete);\n"
-               "}];",
-               AppleStyle);
-  verifyFormat("[UIView animateWithDuration:0 animations:^{\n"
-               "    view.center = CGPointZero;\n"
-               "} completion:^(BOOL finished) {\n"
-               "    NSLog(complete);\n"
-               "}];",
-               AppleStyle);
+               DisableLeftAlignedStyle);
   verifyFormat("[UIView animateWithDuration:0 // This will force colon alignment\n"
                "                 animations:^{\n"
                "                     view.center = CGPointZero;\n"
@@ -9866,19 +9850,9 @@ TEST_F(FormatTest, FormatsXcodeStyleBlocks) {
                "                 completion:^(BOOL finished) {\n"
                "                     NSLog(complete);\n"
                "                 }];",
-               AppleStyle);
-
-  verifyFormat("- (void)aMethod {\n"
-               "    [self.magicalRecordStack saveWithBlock:^(NSManagedObjectContext *localContext) {\n"
-               "        NSLog(format, localContext);\n"
-               "    } completion:^(BOOL success, NSError *error) {\n"
-               "        NSLog(format, localContext);\n"
-               "    }];\n"
-               "}",
-               AppleStyle);
+               DisableLeftAlignedStyle);
 
 }
-
 
 TEST_F(FormatTest, FormatsBlocksWithZeroColumnWidth) {
   FormatStyle ZeroColumn = getLLVMStyle();
@@ -9946,6 +9920,29 @@ TEST_F(FormatTest, FormatsBlocksWithZeroColumnWidth) {
             "  int i;\n"
             "};",
             format("void   (^largeBlock)(void) = ^{ int   i; };", ZeroColumn));
+
+  ZeroColumn.ObjCAvoidLineBreaksForInlineBlocks = true;
+  verifyFormat("[UIView animateWithDuration:0 animations:^{ // This does not change behavior\n"
+               "  view.center = CGPointZero;\n"
+               "} completion:^(BOOL finished) {\n"
+               "  NSLog(complete);\n"
+               "}];",
+               ZeroColumn);
+  verifyFormat("[UIView animateWithDuration:0 animations:^{\n"
+               "  view.center = CGPointZero;\n"
+               "} completion:^(BOOL finished) {\n"
+               "  NSLog(complete);\n"
+               "}];",
+               ZeroColumn);
+
+  verifyFormat("[UIView animateWithDuration:0 // Break\n"
+               "    animations:^{\n"
+               "      view.center = CGPointZero;\n"
+               "    }\n"
+               "    completion:^(BOOL finished) {\n"
+               "      NSLog(complete);\n"
+               "    }];",
+               ZeroColumn);
 }
 
 TEST_F(FormatTest, SupportsCRLF) {
