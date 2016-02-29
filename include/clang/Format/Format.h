@@ -466,6 +466,14 @@ struct FormatStyle {
   /// \brief The number of characters to use for indentation of ObjC blocks.
   unsigned ObjCBlockIndentWidth;
 
+  /// \brief Compress the selector parts to align left when more than two inline
+  /// blocks are specified. Default is true
+  bool ObjCLeftAlignMultipleBlocks;
+
+  /// \brief Avoid inserting line breaks when calculating the length of lines
+  /// with inline Objective-C blocks.
+  bool ObjCAvoidLineBreaksForInlineBlocks;
+
   /// \brief Add a space after ``@property`` in Objective-C, i.e. use
   /// ``@property (readonly)`` instead of ``@property(readonly)``.
   bool ObjCSpaceAfterProperty;

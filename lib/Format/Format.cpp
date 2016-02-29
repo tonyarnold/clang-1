@@ -303,6 +303,8 @@ template <> struct MappingTraits<FormatStyle> {
     IO.mapOptional("MaxEmptyLinesToKeep", Style.MaxEmptyLinesToKeep);
     IO.mapOptional("NamespaceIndentation", Style.NamespaceIndentation);
     IO.mapOptional("ObjCBlockIndentWidth", Style.ObjCBlockIndentWidth);
+    IO.mapOptional("ObjCAvoidLineBreaksForInlineBlocks", Style.ObjCAvoidLineBreaksForInlineBlocks);
+    IO.mapOptional("ObjCLeftAlignMultipleBlocks", Style.ObjCLeftAlignMultipleBlocks);
     IO.mapOptional("ObjCSpaceAfterProperty", Style.ObjCSpaceAfterProperty);
     IO.mapOptional("ObjCSpaceBeforeProtocolList",
                    Style.ObjCSpaceBeforeProtocolList);
@@ -516,6 +518,8 @@ FormatStyle getLLVMStyle() {
   LLVMStyle.KeepEmptyLinesAtTheStartOfBlocks = true;
   LLVMStyle.NamespaceIndentation = FormatStyle::NI_None;
   LLVMStyle.ObjCBlockIndentWidth = 2;
+  LLVMStyle.ObjCLeftAlignMultipleBlocks = true;
+  LLVMStyle.ObjCAvoidLineBreaksForInlineBlocks = false;
   LLVMStyle.ObjCSpaceAfterProperty = false;
   LLVMStyle.ObjCSpaceBeforeProtocolList = true;
   LLVMStyle.PointerAlignment = FormatStyle::PAS_Right;

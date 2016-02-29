@@ -350,7 +350,8 @@ private:
         if (Contexts.back().FirstObjCSelectorName) {
           Contexts.back().FirstObjCSelectorName->LongestObjCSelectorName =
               Contexts.back().LongestObjCSelectorName;
-          if (Left->BlockParameterCount > 1)
+          if (Left->BlockParameterCount > 1 &&
+              Style.ObjCLeftAlignMultipleBlocks)
             Contexts.back().FirstObjCSelectorName->LongestObjCSelectorName = 0;
         }
         next();

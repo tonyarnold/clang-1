@@ -6642,7 +6642,7 @@ TEST_F(FormatTest, FormatsBracedListsInColumnLayout) {
                "                   bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb};");
 
   verifyNoCrash("a<,");
-  
+
   // No braced initializer here.
   verifyFormat("void f() {\n"
                "  struct Dummy {};\n"
@@ -10836,6 +10836,65 @@ TEST_F(FormatTest, FormatsBlocks) {
                "    [self onOperationDone];\n"
                "}];",
                FourIndent);
+
+  FormatStyle AvoidBreaks = getLLVMStyle();
+  AvoidBreaks.ObjCAvoidLineBreaksForInlineBlocks = true;
+  verifyFormat("[UIView animateWithDuration:0 animations:^{ // This does not change behavior\n"
+               "  view.center = CGPointZero;\n"
+               "} completion:^(BOOL finished) {\n"
+               "  NSLog(complete);\n"
+               "}];",
+               AvoidBreaks);
+  verifyFormat("[UIView animateWithDuration:0 animations:^{\n"
+               "  view.center = CGPointZero;\n"
+               "} completion:^(BOOL finished) {\n"
+               "  NSLog(complete);\n"
+               "}];",
+               AvoidBreaks);
+  verifyFormat("[UIView animateWithDuration:0 // Break\n"
+               "    animations:^{\n"
+               "      view.center = CGPointZero;\n"
+               "    }\n"
+               "    completion:^(BOOL finished) {\n"
+               "      NSLog(complete);\n"
+               "    }];",
+               AvoidBreaks);
+}
+
+TEST_F(FormatTest, FormatsBlocksLeftAligned) {
+  FormatStyle DisableLeftAlignedStyle = getLLVMStyle();
+  DisableLeftAlignedStyle.ColumnLimit = 0;
+  DisableLeftAlignedStyle.IndentWidth = 4;
+  DisableLeftAlignedStyle.ObjCBlockIndentWidth = 4;
+  DisableLeftAlignedStyle.ObjCLeftAlignMultipleBlocks = false;
+  verifyFormat("[myObject doSomethingWith:arg1 // Comment\n"
+               "               firstBlock:^(Foo *a) {\n"
+               "                 // ...\n"
+               "                 int i;\n"
+               "                   // ...\n"
+               "                   int i;\n"
+               "               }\n"
+               "              secondBlock:^(Bar *b) {\n"
+               "                // ...\n"
+               "                int i;\n"
+               "                  // ...\n"
+               "                  int i;\n"
+               "              }\n"
+               "               thirdBlock:^Foo(Bar *b) {\n"
+               "                 // ...\n"
+               "                 int i;\n"
+               "                   // ...\n"
+               "                   int i;\n"
+               "               }];",
+               DisableLeftAlignedStyle);
+  verifyFormat("[UIView animateWithDuration:0\n"
+               "                 animations:^{\n"
+               "                     view.center = CGPointZero;\n"
+               "                 }\n"
+               "                 completion:^(BOOL finished) {\n"
+               "                     NSLog(complete);\n"
+               "                 }];",
+               DisableLeftAlignedStyle);
 }
 
 TEST_F(FormatTest, FormatsBlocksWithZeroColumnWidth) {
@@ -10903,6 +10962,29 @@ TEST_F(FormatTest, FormatsBlocksWithZeroColumnWidth) {
             "  int i;\n"
             "};",
             format("void   (^largeBlock)(void) = ^{ int   i; };", ZeroColumn));
+
+  ZeroColumn.ObjCAvoidLineBreaksForInlineBlocks = true;
+  verifyFormat("[UIView animateWithDuration:0 animations:^{ // This does not change behavior\n"
+            "  view.center = CGPointZero;\n"
+            "} completion:^(BOOL finished) {\n"
+            "  NSLog(complete);\n"
+            "}];",
+            ZeroColumn);
+  verifyFormat("[UIView animateWithDuration:0 animations:^{\n"
+            "  view.center = CGPointZero;\n"
+            "} completion:^(BOOL finished) {\n"
+            "  NSLog(complete);\n"
+            "}];",
+            ZeroColumn);
+
+  verifyFormat("[UIView animateWithDuration:0 // Break\n"
+            "    animations:^{\n"
+            "      view.center = CGPointZero;\n"
+            "    }\n"
+            "    completion:^(BOOL finished) {\n"
+            "      NSLog(complete);\n"
+            "    }];",
+            ZeroColumn);
 }
 
 TEST_F(FormatTest, SupportsCRLF) {
